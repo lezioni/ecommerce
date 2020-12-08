@@ -6,11 +6,20 @@ $db = creaConnessionePDO();
 // lettura parametro da URL
 $id = $_GET['id'];
 
+/*
 $stmt = $db->prepare('SELECT macrocategorie.nome as macrocategoria, categorie.nome as categoria, prodotti.* 
                       FROM prodotti, macrocategorie, categorie
                       WHERE prodotti.categoria_id = categorie.id
                       AND categorie.macrocategoria_id = macrocategorie.id
                       AND prodotti.id = :id');
+*/
+
+$stmt = $db->prepare('SELECT m.nome as macrocategoria, c.nome as categoria, p.* 
+                      FROM prodotti p 
+                      join categorie c on (p.categoria_id = c.id)
+                      join macrocategorie m on (c.macrocategoria_id = m.id)
+                      WHERE p.id = :id');
+                      
 
 // bind parametro alla query
 $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -22,7 +31,7 @@ $prodotto = $stmt->fetch(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html>
   <head>
-    <title>MV chocosite</title>
+    <title>Corso DB SQL</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
