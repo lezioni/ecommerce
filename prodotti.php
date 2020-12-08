@@ -35,11 +35,25 @@ $db = creaConnessionePDO();
           <tbody>
           <?php
 
-          $stmt = $db->prepare('SELECT macrocategorie.nome as macrocategoria, categorie.nome as categoria, prodotti.* 
-                                FROM prodotti, macrocategorie, categorie
-                                WHERE prodotti.categoria_id = categorie.id
-                                AND categorie.macrocategoria_id = macrocategorie.id
-                                ORDER BY macrocategoria, categoria, prodotti.nome');
+          $macrocategoria_id = $_GET['macrocategoria_id'] ?? 0;
+          
+          $stmt = $db->prepare('SELECT m.nome as macrocategoria, c.nome as categoria, p.* 
+                                FROM prodotti p 
+                                join categorie c on (p.categoria_id = c.id)
+                                join macrocategorie m on (c.macrocategoria_id = m.id)
+                                ORDER BY macrocategoria, categoria, p.nome');
+          
+          if ( $macrocategoria_id > 0 ) {
+            $stmt = $db->prepare('SELECT m.nome as macrocategoria, c.nome as categoria, p.* 
+            FROM prodotti p 
+            join categorie c on (p.categoria_id = c.id)
+            join macrocategorie m on (c.macrocategoria_id = m.id)
+            where m.id = :macrocategoria_id
+            ORDER BY macrocategoria, categoria, p.nome');
+            $stmt->bindParam(':macrocategoria_id', $macrocategoria_id, PDO::PARAM_INT);
+
+          }
+
           $stmt->execute();
 
           foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $prodotto) {
